@@ -1,0 +1,83 @@
+services:
+  nginx:
+    build: requirements/nginx
+    container_name: nginx
+    image: nginx
+    ports:
+      - "443:443"
+    volumes:
+      - wordpress_data:/var/www/html:rw
+      - ./requirements/nginx/conf/default.conf:/etc/nginx/sites-enabled/default
+    depends_on:
+      - wordpress
+    networks:
+      - inception-net
+
+  wordpress:
+    build: requirements/wordpress
+    container_name: wordpress
+    image: wordpress
+    env_file:
+      - .env
+    secrets:
+      - db_password
+      - credentials
+    environment:
+      WORDPRESS_DB_PASSWORD_FILE: /run/secrets/db_password
+      WORDPRESS_ADMIN_PASSWORD_FILE: /run/secrets/credentials
+      WORDPRESS_USER_PASSWORD_FILE: /run/secrets/credentials
+    volumes:
+      - wordpress_data:/var/www/html
+    networks:
+      - inception-net
+    depends_on:
+      - mariadb
+    ports:
+      - "9000:9000"
+
+  mariadb:
+    build: requirements/mariadb
+    container_name: mariadb
+    image: mariadb
+    env_file:
+      - .env
+    secrets:
+      - db_password
+      - db_root_password
+    environment:
+      WORDPRESS_DB_PASSWORD_FILE: /run/secrets/db_password
+      WORDPRESS_DB_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wpuser
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - inception-net
+    ports:
+      - "3306:3306"
+
+networks:
+  inception-net:
+    driver: bridge
+
+volumes:
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/tambinin/data/mariadb
+      o: bind
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/tambinin/data/wordpress
+      o: bind
+
+secrets:
+  db_password:
+    file: ../secrets/db_password.txt
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+  credentials:
+    file: ../secrets/credentials.txt
