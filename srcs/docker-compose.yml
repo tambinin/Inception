@@ -10,6 +10,7 @@ services:
       - ./requirements/nginx/conf/default.conf:/etc/nginx/sites-enabled/default
     depends_on:
       - wordpress
+    restart: always
     networks:
       - inception-net
 
@@ -30,10 +31,9 @@ services:
       - wordpress_data:/var/www/html
     networks:
       - inception-net
+    restart: always
     depends_on:
       - mariadb
-    ports:
-      - "9000:9000"
 
   mariadb:
     build: requirements/mariadb
@@ -53,8 +53,7 @@ services:
       - mariadb_data:/var/lib/mysql
     networks:
       - inception-net
-    ports:
-      - "3306:3306"
+    restart: always
 
 networks:
   inception-net:

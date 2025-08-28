@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-echo "Entrypoint: Script debut"
-
 WP_PATH="/var/www/html"
 
 echo "Waiting for MariaDB..."
