@@ -1,4 +1,4 @@
-# My-Inception
+# Inception
 # Inception
 
 Ce projet a été réalisé dans le cadre du cursus 42.  
